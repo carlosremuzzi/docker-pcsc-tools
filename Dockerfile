@@ -48,4 +48,8 @@ RUN mkdir -p /run/pcscd \
 
 USER nobody
 
-ENTRYPOINT ["pcscd","-f","-x"]
+COPY --chown=nobody:nobody entrypoint.sh .
+
+ENTRYPOINT ["sh","entrypoint.sh"]
+
+CMD ["pcsc_scan"]
