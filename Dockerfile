@@ -5,7 +5,6 @@ WORKDIR /usr/src/build
 RUN apk add --no-cache \
         ccid \
         perl \
-        perl-dev \
         pcsc-lite \
         pcsc-lite-dev \
     && apk add --no-cache --virtual .build-deps \
@@ -17,6 +16,7 @@ RUN apk add --no-cache \
         libressl-dev \
         libtool \
         m4 \
+        perl-dev \
         readline-dev \
         zlib-dev
 
@@ -38,6 +38,14 @@ RUN curl -fsL http://ludovic.rousseau.free.fr/softwares/pcsc-perl/pcsc-perl-1.4.
     && PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor \
     && make DESTDIR="$pkgdir" install
 
-RUN apk del .build-deps
+RUN apk del .build-deps \
+    && rm -rf /usr/src/build
+
+WORKDIR /home/nobody
+
+RUN mkdir -p /run/pcscd \
+    && chown -R nobody:nobody /run/pcscd
+
+USER nobody
 
 ENTRYPOINT ["pcscd","-f","-x"]
